@@ -394,6 +394,26 @@ class TestCollectLogs:
             # Verify all entries have correct source
             for entry in data['entries']:
                 assert isinstance(entry, LogEntry)
+    
+    def test_collect_logs_with_log_sources_filter(self, tmp_path):
+        """Test filtering of log collection by specified log sources."""
+        audit_log = tmp_path / "audit.log"
+        audit_log.write_text(AUDIT_LOG_FIXTURE)
+        
+        syslog = tmp_path / "syslog"
+        syslog.write_text(SYSLOG_FIXTURE)
+        
+        log_paths = {
+            'audit': str(audit_log),
+            'syslog': str(syslog),
+        }
+        
+        results = collect_logs(log_paths=log_paths, log_sources=['syslog'])
+        
+        assert 'syslog' in results
+        assert 'audit' not in results
+        assert results['syslog']['count'] == 5
+        assert results['syslog']['path'] == str(syslog)
 
 
 class TestLogPathConfiguration:

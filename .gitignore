@@ -22,6 +22,7 @@ wheels/
 
 # Virtual environments
 venv/
+.venv/
 env/
 ENV/
 env.bak/
@@ -37,6 +38,7 @@ venv.bak/
 
 # Agent & Results
 static/results/
+static_results/
 logs/
 *.log
 

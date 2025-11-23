@@ -292,7 +292,8 @@ def collect_logs(
     keywords: Optional[List[str]] = None,
     pids: Optional[List[int]] = None,
     max_entries: Optional[int] = 1000,
-    log_paths: Optional[Dict[str, str]] = None
+    log_paths: Optional[Dict[str, str]] = None,
+    log_sources: Optional[List[str]] = None
 ) -> Dict[str, Dict[str, Union[int, List[LogEntry]]]]:
     """
     Collect and aggregate logs from multiple sources.
@@ -304,6 +305,8 @@ def collect_logs(
         pids: List of process IDs to filter
         max_entries: Maximum entries to return per log source
         log_paths: Optional dict mapping log type to file path
+        log_sources: Optional list of log types to collect (e.g., ['audit', 'syslog']).
+                    If None, all available log sources are collected.
         
     Returns:
         Dictionary keyed by log source with structure:
@@ -316,6 +319,11 @@ def collect_logs(
         }
     """
     paths = get_log_paths(log_paths)
+    
+    # Filter paths to only requested log sources if specified
+    if log_sources is not None:
+        paths = {k: v for k, v in paths.items() if k in log_sources}
+    
     results = {}
     
     for log_type, log_path in paths.items():
