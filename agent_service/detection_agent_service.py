@@ -24,6 +24,7 @@ from agent_service.log_parser import LogEntry, collect_logs
 
 
 RESULTS_DIR_ENV_VAR = "AGENT_RESULTS_DIR"
+LEGACY_RESULTS_DIR_ENV_VAR = "STATIC_RESULTS_DIR"
 DEFAULT_RESULTS_DIR = "static_results"
 
 
@@ -97,8 +98,12 @@ def get_results_directory() -> Path:
     Returns:
         Path object for the results directory
     """
-    results_dir = os.environ.get(RESULTS_DIR_ENV_VAR, DEFAULT_RESULTS_DIR)
-    path = Path(results_dir)
+    configured_dir = (
+        os.environ.get(RESULTS_DIR_ENV_VAR)
+        or os.environ.get(LEGACY_RESULTS_DIR_ENV_VAR)
+        or DEFAULT_RESULTS_DIR
+    )
+    path = Path(configured_dir)
     path.mkdir(parents=True, exist_ok=True)
     return path
 

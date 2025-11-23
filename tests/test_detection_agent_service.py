@@ -16,6 +16,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from agent_service.detection_agent_service import (
+    LEGACY_RESULTS_DIR_ENV_VAR,
     RESULTS_DIR_ENV_VAR,
     app,
     get_results_directory,
@@ -837,6 +838,17 @@ class TestDirectoryManagement:
         
         assert result == custom_dir
         assert custom_dir.exists()
+    
+    def test_get_results_directory_respects_legacy_env_var(self, tmp_path, monkeypatch):
+        """Test that the legacy STATIC_RESULTS_DIR override is still honored."""
+        legacy_dir = tmp_path / "legacy_results"
+        monkeypatch.delenv(RESULTS_DIR_ENV_VAR, raising=False)
+        monkeypatch.setenv(LEGACY_RESULTS_DIR_ENV_VAR, str(legacy_dir))
+        
+        result = get_results_directory()
+        
+        assert result == legacy_dir
+        assert legacy_dir.exists()
     
     def test_get_results_directory_creates_directory(self, tmp_path, monkeypatch):
         """Test that get_results_directory creates the directory."""
